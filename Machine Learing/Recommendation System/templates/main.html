@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .nav-link:hover {
+            color: orange !important;
+        }
+        .nav-link.btn {
+            border-radius: 5px;
+        }
+        .modal-body {
+            text-align: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            color: #000;
+        }
+        .modal-content.dark {
+            background-color: #000;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand mx-auto" href="#">Ecommerce Recommendation System</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+    <ul class="navbar-nav">
+      <li class="nav-item active">
+        <a class="nav-link" href="index"><i class="fas fa-home"></i> Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#" id="settingsLink"><i class="fas fa-cog"></i> Settings</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link btn btn-outline-primary mr-2" href="#" data-toggle="modal" data-target="#signupModal">Sign Up</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link btn btn-primary" href="#" data-toggle="modal" data-target="#signinModal">Sign In</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Search Bar -->
+<div class="container" style="margin-top:30px;">
+    <form action="/recommendations" method="post" style="display:flex;">
+            <input type="text" class="form-control mr-2" name="prod" placeholder="Search for products...">
+            <input type="number" class="form-control" name="nbr" placeholder="Number of products..." style="width:100px;">
+            <button class="btn btn-primary">Search</button>
+    </form>
+</div>
+
+<!-- Display Flash Message -->
+{% if message %}
+<h5 style="margin-left:42%; margin-top:10px; text:bold;">{{ message }}</h5>
+{% endif %}
+
+<!-- Trending Recommendations -->
+{% if content_based_rec is not none and not content_based_rec.empty %}
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Recommended Products</h2>
+  <div class="row mt-4">
+    {% for index, product in content_based_rec.iterrows() %}
+    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+      <div class="card">
+          <img src="{{ product['ImageURL'] }}" class="card-img-top" alt="{{ product['Name'] }}" style="height: 200px;">
+        <div class="card-body">
+          <h5 class="card-title">{{ truncate(product['Name'], 12) }}</h5>
+          <p class="card-text">Brand: {{ product['Brand'] }}</p>
+          
+          <!-- Random Price -->
+          {% set random_price = range(10, 100) | random %}
+          <p><strong>Price:</strong> ${{ random_price }}</p>
+
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#productModal{{ index }}">Buy Now</button>
+        </div>
+      </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="productModal{{ index }}" tabindex="-1" role="dialog" aria-labelledby="productModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="productModalLabel">{{ product['Name'] }}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-4">
+                  <img src="{{ product['ImageURL'] }}" class="img-fluid" alt="{{ product['Name'] }}" style="height: 200px;">
+              </div>
+              <div class="col-md-8">
+                <p><strong>Brand:</strong> {{ product['Brand'] }}</p>
+                <p><strong>Review Count:</strong> {{ product['ReviewCount'] }}</p>
+                <p><strong>Rating:</strong> {{ product['Rating'] }}</p>
+                <p><strong>Price:</strong> ${{ random_price }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% else %}
+<p>No recommendations available at the moment.</p>
+{% endif %}
+
+<!-- Bootstrap modal for sign up -->
+<!-- Modal code here for sign up and sign in modals -->
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
